@@ -115,6 +115,19 @@ public class DataHubSyncConfig extends HoodieSyncConfig {
       .defaultValue(true)
       .markAdvanced()
       .withDocumentation("Suppress exceptions during DataHub sync. This is true by default to ensure that when running inline with other jobs, the sync does not fail the job.");
+  public static final ConfigProperty<String> META_SYNC_DATAHUB_DATABASE_NAME = ConfigProperty
+      .key("hoodie.meta.sync.datahub.database.name")
+      .noDefaultValue()
+      .markAdvanced()
+      .withDocumentation("The name of the destination database that we should sync the hudi table to.");
+
+  public static final ConfigProperty<String> META_SYNC_DATAHUB_TABLE_NAME = ConfigProperty
+      .key("hoodie.meta.sync.datahub.table.name")
+      .noDefaultValue()
+      .markAdvanced()
+      .withDocumentation("The name of the destination table that we should sync the hudi table to.");
+
+  public final HoodieDataHubDatasetIdentifier datasetIdentifier;
 
   public DataHubSyncConfig(Properties props) {
     super(props);
@@ -196,6 +209,12 @@ public class DataHubSyncConfig extends HoodieSyncConfig {
         "--suppress-exceptions"}, description = "Suppress exceptions during DataHub sync.")
     public String suppressExceptions;
 
+    @Parameter(names = {"--database-name"}, description = "Database name to use for datahub sync")
+    public String databaseName;
+
+    @Parameter(names = {"--table-name"}, description = "Table name to use for datahub sync")
+    public String tableName;
+
     public boolean isHelp() {
       return hoodieSyncConfigParams.isHelp();
     }
@@ -216,6 +235,8 @@ public class DataHubSyncConfig extends HoodieSyncConfig {
       } else {
         props.setProperty(META_SYNC_DATAHUB_SYNC_SUPPRESS_EXCEPTIONS.key(), String.valueOf(suppressExceptions));
       }
+      props.setPropertyIfNonNull(META_SYNC_DATAHUB_DATABASE_NAME.key(), databaseName);
+      props.setPropertyIfNonNull(META_SYNC_DATAHUB_TABLE_NAME.key(), tableName);
       return props;
     }
   }
