@@ -137,9 +137,6 @@ public class DataHubSyncConfig extends HoodieSyncConfig {
     @Parameter(names = {"--database-name"}, description = "Database name to use for datahub sync")
     public String databaseName;
 
-    @Parameter(names = {"--table-name"}, description = "Table name to use for datahub sync")
-    public String tableName;
-
     public boolean isHelp() {
       return hoodieSyncConfigParams.isHelp();
     }
@@ -153,7 +150,7 @@ public class DataHubSyncConfig extends HoodieSyncConfig {
       props.setPropertyIfNonNull(META_SYNC_DATAHUB_DATAPLATFORM_NAME.key(), dataPlatformName);
       props.setPropertyIfNonNull(META_SYNC_DATAHUB_DATASET_ENV.key(), datasetEnv);
       props.setPropertyIfNonNull(META_SYNC_DATAHUB_DATABASE_NAME.key(), databaseName);
-      props.setPropertyIfNonNull(META_SYNC_DATAHUB_TABLE_NAME.key(), tableName);
+      props.setPropertyIfNonNull(META_SYNC_DATAHUB_TABLE_NAME.key(), hoodieSyncConfigParams.tableName);
       return props;
     }
   }

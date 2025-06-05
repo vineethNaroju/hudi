@@ -134,6 +134,16 @@ public class AWSGlueCatalogSyncClient extends HoodieSyncClient {
   }
 
   @Override
+  public String getTableName() {
+    return this.configuredTableName;
+  }
+
+  @Override
+  public String getDatabaseName() {
+    return this.databaseName;
+  }
+
+  @Override
   public List<Partition> getAllPartitions(String tableName) {
     try {
       List<Partition> partitions = new ArrayList<>();
