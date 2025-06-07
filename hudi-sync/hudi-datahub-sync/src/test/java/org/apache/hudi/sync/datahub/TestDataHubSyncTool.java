@@ -29,6 +29,8 @@ import org.apache.hudi.sync.common.util.SyncUtilHelpers;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
+
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -68,28 +70,19 @@ class TestDataHubSyncTool extends HoodieCommonTestHarness {
   }
 
   @Test
-  void testSyncHoodieTable() {
-    HoodieTableMetaClient mockHoodieTableMetaClient = mock(HoodieTableMetaClient.class);
-    DataHubSyncClient mockDataHubSyncClient = mock(DataHubSyncClient.class);
+  void testSyncHoodieTable_actualLines() {
+    HoodieTableMetaClient mockMetaClient = mock(HoodieTableMetaClient.class);
 
-    when(mockDataHubSyncClient.getTableName()).thenReturn("test_table");
+    try (MockedConstruction<DataHubSyncClient> mocked = org.mockito.Mockito.mockConstruction(DataHubSyncClient.class, (mock, context) -> {
+      when(mock.getTableName()).thenReturn("test_table");
+    })) {
+      DataHubSyncTool tool = new DataHubSyncTool(new Properties(), null, Option.of(mockMetaClient));
+      tool.syncHoodieTable();
 
-    DataHubSyncTool dataHubSyncTool = new DataHubSyncTool(new Properties(), null, Option.of(mockHoodieTableMetaClient)) {
-
-      @Override
-      public void syncHoodieTable() {
-        try (DataHubSyncClient syncClient = mockDataHubSyncClient) {
-          when(syncClient.getTableName()).thenReturn("test_table");
-          syncClient.updateTableSchema(syncClient.getTableName(), null);
-          syncClient.updateLastCommitTimeSynced(syncClient.getTableName());
-        }
-      }
-    };
-
-    dataHubSyncTool.syncHoodieTable();
-
-    verify(mockDataHubSyncClient).updateTableSchema("test_table", null);
-    verify(mockDataHubSyncClient).updateLastCommitTimeSynced("test_table");
-    verify(mockDataHubSyncClient).close();
+      DataHubSyncClient mockClient = mocked.constructed().get(0);
+      verify(mockClient).updateTableSchema("test_table", null);
+      verify(mockClient).updateLastCommitTimeSynced("test_table");
+      verify(mockClient).close();
+    }
   }
 }
