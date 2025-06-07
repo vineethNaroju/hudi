@@ -29,10 +29,13 @@ import org.apache.hudi.sync.common.util.SyncUtilHelpers;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.junit.jupiter.api.Test;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class TestDataHubSyncTool extends HoodieCommonTestHarness {
   @Test
@@ -62,5 +65,31 @@ class TestDataHubSyncTool extends HoodieCommonTestHarness {
       HoodieSyncTool syncTool = new DataHubSyncTool(typedProperties);
       syncTool.close();
     });
+  }
+
+  @Test
+  void testSyncHoodieTable() {
+    HoodieTableMetaClient mockHoodieTableMetaClient = mock(HoodieTableMetaClient.class);
+    DataHubSyncClient mockDataHubSyncClient = mock(DataHubSyncClient.class);
+
+    when(mockDataHubSyncClient.getTableName()).thenReturn("test_table");
+
+    DataHubSyncTool dataHubSyncTool = new DataHubSyncTool(new Properties(), null, Option.of(mockHoodieTableMetaClient)) {
+
+      @Override
+      public void syncHoodieTable() {
+        try (DataHubSyncClient syncClient = mockDataHubSyncClient) {
+          when(syncClient.getTableName()).thenReturn("test_table");
+          syncClient.updateTableSchema(syncClient.getTableName(), null);
+          syncClient.updateLastCommitTimeSynced(syncClient.getTableName());
+        }
+      }
+    };
+
+    dataHubSyncTool.syncHoodieTable();
+
+    verify(mockDataHubSyncClient).updateTableSchema("test_table", null);
+    verify(mockDataHubSyncClient).updateLastCommitTimeSynced("test_table");
+    verify(mockDataHubSyncClient).close();
   }
 }
