@@ -107,7 +107,6 @@ public class AWSGlueCatalogSyncClient extends HoodieSyncClient {
    */
   private static final String ENABLE_MDT_LISTING = "hudi.metadata-listing-enabled";
   private final String databaseName;
-  private final String configuredTableName;
 
   private final boolean skipTableArchive;
   private final String enableMetadataTable;
@@ -122,7 +121,6 @@ public class AWSGlueCatalogSyncClient extends HoodieSyncClient {
     super(config, metaClient);
     this.awsGlue = awsGlue;
     this.databaseName = config.getStringOrDefault(GLUE_SYNC_DATABASE_NAME, config.getString(META_SYNC_DATABASE_NAME));
-    this.configuredTableName = config.getStringOrDefault(GLUE_SYNC_TABLE_NAME, config.getString(META_SYNC_TABLE_NAME));
     this.skipTableArchive = config.getBooleanOrDefault(GlueCatalogSyncClientConfig.GLUE_SKIP_TABLE_ARCHIVE);
     this.enableMetadataTable = Boolean.toString(config.getBoolean(GLUE_METADATA_FILE_LISTING)).toUpperCase();
     GetCallerIdentityResponse identityResponse = stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build());
@@ -135,7 +133,7 @@ public class AWSGlueCatalogSyncClient extends HoodieSyncClient {
 
   @Override
   public String getTableName() {
-    return this.configuredTableName;
+    return this.config.getStringOrDefault(GLUE_SYNC_TABLE_NAME, config.getString(META_SYNC_TABLE_NAME));
   }
 
   @Override
