@@ -56,7 +56,7 @@ class TestDataHubSyncConfig {
     props.setProperty(META_SYNC_DATAHUB_TABLE_NAME.key(), table);
 
     DataHubSyncConfig syncConfig = new DataHubSyncConfig(props);
-    DatasetUrn datasetUrn = syncConfig.datasetIdentifier.getDatasetUrn();
+    DatasetUrn datasetUrn = syncConfig.getDatasetIdentifier().getDatasetUrn();
 
     assertEquals(String.format("%s.%s", db, table), datasetUrn.getDatasetNameEntity());
 
@@ -75,7 +75,7 @@ class TestDataHubSyncConfig {
     props.setProperty(META_SYNC_TABLE_NAME.key(), "table");
 
     DataHubSyncConfig syncConfig = new DataHubSyncConfig(props);
-    DatasetUrn datasetUrn = syncConfig.datasetIdentifier.getDatasetUrn();
+    DatasetUrn datasetUrn = syncConfig.getDatasetIdentifier().getDatasetUrn();
 
     assertEquals("db.table", datasetUrn.getDatasetNameEntity());
   }

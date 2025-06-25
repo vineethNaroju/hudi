@@ -127,8 +127,6 @@ public class DataHubSyncConfig extends HoodieSyncConfig {
       .markAdvanced()
       .withDocumentation("The name of the destination table that we should sync the hudi table to.");
 
-  public final HoodieDataHubDatasetIdentifier datasetIdentifier;
-
   public DataHubSyncConfig(Properties props) {
     super(props);
     // Log warning if the domain identifier is provided but is not in urn form
